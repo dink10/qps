@@ -117,7 +117,7 @@ func getHandleFunc(q *wsqueue.Topic) func(w http.ResponseWriter, r *http.Request
 func validateParams(r *http.Request) (int, bool) {
 	key := r.URL.Query().Get("id")
 
-	if len(key) == 1 {
+	if len(key) == 0 {
 		log.Println("Url Param ID is missing")
 		return 0, false
 	}
