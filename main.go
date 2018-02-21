@@ -115,21 +115,21 @@ func getHandleFunc(q *wsqueue.Topic) func(w http.ResponseWriter, r *http.Request
 
 // Validation request params
 func validateParams(r *http.Request) (int, bool) {
-	key := r.URL.Query().Get("campaign_id")
+	key := r.URL.Query().Get("id")
 
-	if len(key) < 1 {
-		log.Println("Url Param 'campaign_id' is missing")
+	if len(key) == 1 {
+		log.Println("Url Param ID is missing")
 		return 0, false
 	}
 
-	campaignId, _ := strconv.Atoi(key)
+	id, err := strconv.Atoi(key)
 
-	if campaignId == 0 {
-		log.Println("Url Param 'campaign_id' is not a number")
+	if err != nil {
+		log.Printf("Url Param ID error: %s", err)
 		return 0, false
 	}
 
-	return campaignId, true
+	return id, true
 }
 
 // Run a client
@@ -149,7 +149,7 @@ func runClient(node Node, serverId int) {
 			var message Message
 			err = json.Unmarshal([]byte(m.Body), &message)
 			if err == nil {
-				if CampaignsCounters[message.Id] == nil {
+				if _, ok := CampaignsCounters[message.Id]; !ok {
 					CampaignsCounters[message.Id] = NewCounter()
 				}
 				Increment(CampaignsCounters[message.Id])
